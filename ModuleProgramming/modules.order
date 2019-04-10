@@ -1,4 +1,6 @@
-kernel//home/network/ModuleProgramming/hello.ko
-kernel//home/network/ModuleProgramming/hello-2.ko
-kernel//home/network/ModuleProgramming/hello-3.ko
-kernel//home/network/ModuleProgramming/hello-4.ko
+kernel//home/network/MyUniversity/ModuleProgramming/hello.ko
+kernel//home/network/MyUniversity/ModuleProgramming/hello-2.ko
+kernel//home/network/MyUniversity/ModuleProgramming/hello-3.ko
+kernel//home/network/MyUniversity/ModuleProgramming/hello-4.ko
+kernel//home/network/MyUniversity/ModuleProgramming/hello-5.ko
+kernel//home/network/MyUniversity/ModuleProgramming/startstop.ko

@@ -1,2 +1,2 @@
-/home/network/ModuleProgramming/hello-2.ko
-/home/network/ModuleProgramming/hello-2.o
+/home/network/MyUniversity/ModuleProgramming/hello-2.ko
+/home/network/MyUniversity/ModuleProgramming/hello-2.o
