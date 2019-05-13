@@ -18,6 +18,7 @@ static volatile unsigned int *GPH2DAT;
  
 struct timer_list time;
 static int major,flag = 0;
+//第一步：定义一个输入设备的结构体
 struct input_dev *input_dev;
  
 irqreturn_t key_interr(int irqno,void *dev)
@@ -34,7 +35,8 @@ static void timer_fun(unsigned long arg)
 	if( !( (*GPH2DAT) & 1 ))//如果按键还是低电平（继续按下）执行以下程序
 	{
 		printk("hello keyboard\n");
-	
+		
+		//第二步：填充上报事件
 		/*填充上报事件,报告事件（按下或者不按）*/
 		input_report_key(input_dev,KEY_0,1);//
 		input_report_key(input_dev,KEY_0,0);
@@ -105,6 +107,7 @@ static __init int led_init(void)
 	major = register_chrdev(0,"LED",&t_fops);
 	printk("major = %d\n",major);
 	
+	//第三步：构造一个input设备，设置支持的事件类型，将设备注册到内核中。（一般在程序的初始化中）
 	/*构造一个input设备*/
 	input_dev = input_allocate_device();
 	input_dev->name = "key_input_dev";
