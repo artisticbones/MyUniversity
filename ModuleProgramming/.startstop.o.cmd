@@ -1,1 +1,0 @@
-cmd_/home/network/MyUniversity/ModuleProgramming/startstop.o := ld -m elf_x86_64  -z max-page-size=0x200000   -r -o /home/network/MyUniversity/ModuleProgramming/startstop.o /home/network/MyUniversity/ModuleProgramming/start.o /home/network/MyUniversity/ModuleProgramming/stop.o 
