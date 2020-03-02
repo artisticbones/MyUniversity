@@ -4,22 +4,18 @@
 int main(){
     int i=0,N=0;
     char s[5000];
-    while (scanf("%c",&s[i])!=EOF)
+    while (scanf("%c",&s[i]) != EOF)
     {
-        /* code */
         if (s[i] == ' ')
         {
-            /* code */
             N = 0;
         }
         else
         {
-            /* code */
             N++;
         }
         if (i < 4999)
         {
-            /* code */
             i++;
         }
     }

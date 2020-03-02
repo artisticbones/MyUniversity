@@ -6,7 +6,7 @@ int main(){
     char str[5000];
     if(gets(str) == NULL){
         return 0;
-    }
+    };
     char s = getchar();
     int i,N=0;
     int change=0;

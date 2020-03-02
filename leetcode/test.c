@@ -1,7 +1,12 @@
 #include <stdio.h>
 
 int main(){
-    printf("%d\n",'A');
-    printf("%d",'a'-'A');
+    int i;
+    while (scanf("%d",&i) != EOF)
+    {
+        int temp = (i % 10 >= 5);
+        printf("%d\n",temp);
+    }
+    
     return 0;
 }
