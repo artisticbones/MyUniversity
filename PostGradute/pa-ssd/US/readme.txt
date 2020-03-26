@@ -6,7 +6,7 @@ Application steps:
 1)	Compile the code and generate an executablefile.
 	A make clean
 	B make all
-	C, ./ssd
+	C ./ssd
 2)	Run the executable file, input the name of trace file 
 3)	Analyze the output file and statistic file for further experiments.
 

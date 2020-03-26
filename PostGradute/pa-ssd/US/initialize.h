@@ -21,11 +21,12 @@ Hao Luo         2011/01/01        2.0           Change               luohao13568
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <time.h>
 #include <ctype.h>
 #include <sys/types.h>
 #include "avlTree.h"
+
+#define NULL 0
 
 #define SECTOR 512
 #define BUFSIZE 200
@@ -170,8 +171,38 @@ struct ac_time_characteristics{
 	int tPROG_M;   //program time for MSB page
 }ac_timing;
 
+/* 需要进行gc的节点，放到cache中 */
+typedef struct CacheNode
+{
+	struct CacheNode *next;
+	//下述保存需要gc的节点的信息
+	unsigned int lpn;
+	unsigned int freeState;
+	unsigned int validState;
+	unsigned char type;
+	unsigned char subFlag; // 查询是否有其他gc节点
+	
+}CacheNode;
 
-struct ssd_info{ 
+/* 记录所有gc节点的链表 */
+typedef struct CacheNodeList
+{
+	struct CacheNode *head;
+	unsigned int allPage;
+	unsigned int freePage;
+	unsigned char nowType;
+};
+
+
+
+struct ssd_info{
+
+	/* modified */
+	unsigned int validPageCacheCount;
+	unsigned int freeValidPageCacheCount;
+	unsigned long  gcCount;
+	unsigned int writeCache;
+
 	double ssd_energy;                   //SSD的能耗，是时间和芯片数的函数,能耗因子
 	int64_t current_time;                //记录系统时间
 	int64_t next_request_time;
@@ -276,12 +307,18 @@ struct ssd_info{
 
     struct parameter_value *parameter;   //SSD参数因子
 	struct dram_info *dram;
+
+	/* modified */
+	struct CacheNodeList cacheNodeList; // cache gc
+	struct request *cacheReq;	//请求cache gc 队列
+		
 	struct request *request_queue;       //dynamic request queue
 	struct request *request_tail;	     // the tail of the request queue
 	struct sub_request *subs_w_head;     //当采用全动态分配时，分配是不知道应该挂载哪个channel上，所以先挂在ssd上，等进入process函数时才挂到相应的channel的读请求队列上
 	struct sub_request *subs_w_tail;
 	struct event_node *event;            //事件队列，每产生一个新的事件，按照时间顺序加到这个队列，在simulate函数最后，根据这个队列队首的时间，确定时间
 	struct channel_info *channel_head;   //指向channel结构体数组的首地址
+
 };
 
 
@@ -375,7 +412,7 @@ struct blk_info{
 	unsigned int free_lsb_num;
 	unsigned int free_msb_num;
 	unsigned int free_csb_num;
-	unsigned int invalid_lsb_num;
+	unsigned int invalid_lsb_num;	//失效
 	int last_write_lsb;
 	int last_write_msb;
 	int last_write_csb;
