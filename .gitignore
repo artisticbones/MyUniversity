@@ -2,3 +2,5 @@
 !/Cryptography/*.c
 !/Leetcode/*.c
 !/PostGradute/*.c
+!/PostGradute/pa-ssd/US/*.c
+!/PostGradute/cachegc/*.c
