@@ -191,6 +191,7 @@ typedef struct CacheNodeList
 	unsigned int allPage;
 	unsigned int freePage;
 	unsigned char nowType;
+	unsigned int capacity;
 };
 
 

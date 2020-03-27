@@ -36,11 +36,13 @@ int  main(int argc, char* argv[])
 	printf("enter main\n"); 
 	#endif
 
+	/* 构造 SSD 结构体，并初始化 */
 	ssd=(struct ssd_info*)malloc(sizeof(struct ssd_info));
 	alloc_assert(ssd,"ssd");
 	memset(ssd,0, sizeof(struct ssd_info));
 	
 	//*****************************************************
+	/* SSD三个参数，模拟次数，倍速模拟，trace名 */
 	int sTIMES, speed_up;
 	printf("Read parameters to the main function.\n");
 	sscanf(argv[1], "%d", &sTIMES);
@@ -48,7 +50,7 @@ int  main(int argc, char* argv[])
 	sscanf(argv[3], "%s", &(ssd->tracefilename));
 	printf("Running trace file: %s.\n", ssd->tracefilename);
 	//*****************************************************
-	
+	/* SSDsim 基本过程 1.初始化 2.预处理 3.旧化SSD 4.寻找最近事件函数  */
 	ssd=initiation(ssd);
 	printf("Chip_channel: %d, %d\n", ssd->parameter->chip_channel[0],ssd->parameter->chip_num);
 	make_aged(ssd);
@@ -56,6 +58,7 @@ int  main(int argc, char* argv[])
 	get_old_zwh(ssd);
 	printf("free_lsb: %d, free_csb: %d, free_msb: %d\n", ssd->free_lsb_count, ssd->free_csb_count, ssd->free_msb_count);
 	printf("Total request num: %lld.\n", ssd->total_request_num);
+
 	for (i=0;i<ssd->parameter->channel_number;i++)
 	{
 		for (j=0;j<ssd->parameter->die_chip;j++)
@@ -86,11 +89,13 @@ int  main(int argc, char* argv[])
 	printf("GC_hard threshold: %.2f.\n", ssd->parameter->gc_hard_threshold);
 	ssd->speed_up = speed_up;
 	//*********************************************
-	//ssd=simulate(ssd);
-        srand((unsigned int)time(NULL));
+	/* srand((unsigned int)time(NULL));
+	ssd=simulate(ssd); */
+    
+	srand((unsigned int)time(NULL));
 	ssd=simulate_multiple(ssd, sTIMES);
 	statistic_output(ssd);  
-/*	free_all_node(ssd);*/
+	/* free_all_node(ssd); */
 
 	printf("\n");
 	printf("the simulation is completed!\n");
@@ -158,7 +163,7 @@ struct ssd_info *simulate(struct ssd_info *ssd)
 	return ssd;
 }
 
-struct ssd_info *simulate_multiple(struct ssd_info *ssd, int sTIMES)
+ struct ssd_info *simulate_multiple(struct ssd_info *ssd, int sTIMES)
 {
 	int flag=1,flag1=0;
 	double output_step=0;
@@ -184,7 +189,7 @@ struct ssd_info *simulate_multiple(struct ssd_info *ssd, int sTIMES)
 		}
 	/************************IMPORTANT FACTOR************************************/
 	//ssd->parameter->turbo_mode_factor = 100;
-	fprintf(ssd->statisticfile, "requests            time       gc_count          r_lat          w_lat          w_lsb          w_csb          w_msb           f_gc       mov_page      free_lsb     r_req_count    w_req_count    same_pages       req_lsb       req_csb       req_msb       w_req_count_l    same_pages_l       req_lsb_l       req_csb_l       req_msb_l\n");
+ 	fprintf(ssd->statisticfile, "requests            time       gc_count          r_lat          w_lat          w_lsb          w_csb          w_msb           f_gc       mov_page      free_lsb     r_req_count    w_req_count    same_pages       req_lsb       req_csb       req_msb       w_req_count_l    same_pages_l       req_lsb_l       req_csb_l       req_msb_l\n");
 	while(simulate_times < sTIMES){
 		//*********************************************************
 		/*
@@ -264,8 +269,7 @@ struct ssd_info *simulate_multiple(struct ssd_info *ssd, int sTIMES)
 			*/
 		}
 	return ssd;
-}
-
+} 
 
 /********    get_request    ******************************************************
 *	1.get requests that arrived already
@@ -703,10 +707,11 @@ struct ssd_info *distribute(struct ssd_info *ssd)
 *打印输出相关的运行结果到outputfile文件中，这里的结果主要是运行的时间
 **********************************************************************/
 void trace_output(struct ssd_info* ssd){
-	int flag = 1;	
+	int flag = 1;
+	unsigned char cacheNodedel = 1;	
 	int64_t start_time, end_time;
-	struct request *req, *pre_node;
-	struct sub_request *sub, *tmp;
+	struct request *req, *pre_node,*cacheGcReq;
+	struct sub_request *sub, *tmp,*preCacheNode = NULL;
 
 #ifdef DEBUG
 	printf("enter trace_output,  current time:%lld\n",ssd->current_time);
@@ -714,12 +719,58 @@ void trace_output(struct ssd_info* ssd){
 	int debug_0918 = 0;
 	pre_node=NULL;
 	req = ssd->request_queue;
+	cacheGcReq = ssd->cacheReq;
 	start_time = 0;
 	end_time = 0;
 
-	if(req == NULL)
+	if(req == NULL && cacheGcReq == NULL)
 		return;
 
+	while (cacheGcReq != NULL)
+	{
+		sub = cacheGcReq->subs;
+		if((sub->current_state == SR_COMPLETE)||((sub->next_state==SR_COMPLETE)&&(sub->next_state_predict_time<=ssd->current_time))){
+			cacheNodedel = 0;
+			CacheNode* validPageCacheNode = ssd->cacheNodeList.head;
+			if(validPageCacheNode->lpn == sub->lpn){
+				ssd->cacheNodeList.head = validPageCacheNode->next;
+				ssd->cacheNodeList.freePage++;
+				ssd->writeCache++;
+				cacheNodedel = 1;
+				free(validPageCacheNode);
+			}else{
+				while(validPageCacheNode->next){
+					if(validPageCacheNode->next->lpn == sub->lpn){
+						cacheNodedel = 1;
+						CacheNode* cacheNode = validPageCacheNode->next;
+						validPageCacheNode->next = cacheNode->next;
+						ssd->cacheNodeList.freePage++;
+						ssd->writeCache++;
+						free(cacheNode);
+						break;
+					}
+					validPageCacheNode = validPageCacheNode->next;
+				}
+			}
+			if(!preCacheNode){
+				req->subs = sub->next_subs;
+				free(sub);
+				sub = req->subs;
+			}else {
+				preCacheNode->next_subs = sub->next_subs;
+				free(sub);
+				sub = preCacheNode->next_subs;
+			}
+			if(!cacheNodedel){
+				printf("cacheNodedel\n");
+				while(1);
+			}
+		}else{
+			preCacheNode = sub;
+			sub = sub->next_subs;
+		}
+	}
+	
 	while(req != NULL)	
 	{
 		sub = req->subs;

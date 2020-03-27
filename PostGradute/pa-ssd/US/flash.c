@@ -1789,14 +1789,50 @@ struct ssd_info *process(struct ssd_info *ssd)
 			break;
 		}
 	}
-	if(flag==1)
+	if(flag==1)	//不存在读写子请求
 	{
-		ssd->flag=1;                                                                
-		if (ssd->gc_request>0)                                                            /*SSD中有gc操作的请求*/
+		CacheNode* cacheNode = ssd->cacheNodeList.head;	//SSD 中如果有需要进行 cachegc，将头结点给cacheNode
+		
+		if (cacheNode)
 		{
-			gc(ssd,0,1);                                                                  /*这个gc要求所有channel都必须遍历到*/
+			unsigned char loopFlag = 0;	// 控制结束cachegc
+			unsigned char cacheNodeType;
+			
+			/* 判断是否有其他需要gc的节点 */
+			if (!cacheNode->subFlag)
+			{
+				creat_sub_request(ssd,cacheNode->lpn,size(cacheNode->validState),cacheNode->validState,ssd->cacheReq,WRITE,TARGET_LSB);
+				cacheNode->subFlag = 1;
+				loopFlag = 1;
+				cacheNodeType = cacheNode->type;
+			}
+			cacheNode = cacheNode->next;
+
+			while (cacheNode)
+			{
+				if(cacheNodeType == cacheNode->type || !loopFlag)
+				{
+					if (!cacheNode->subFlag)
+					{
+						creat_sub_request(ssd,cacheNode->lpn,size(cacheNode->validState),cacheNode->validState,ssd->cacheReq,WRITE,TARGET_LSB);
+						cacheNode->subFlag = 1;
+						loopFlag = 1;
+						cacheNodeType = cacheNode->type;
+					}
+				}
+				cacheNode = cacheNode->next;
+			}
 		}
-		return ssd;
+		else
+		{
+			ssd->flag=1;
+			/*SSD中有gc操作的请求*/                                                                
+			if (ssd->gc_request>0)                                                            
+			{/*这个gc要求所有channel都必须遍历到*/
+				gc(ssd,0,1);                                                                  
+			}
+			return ssd;
+		}
 	}
 	else
 	{
