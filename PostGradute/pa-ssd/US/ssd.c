@@ -56,6 +56,25 @@ int  main(int argc, char* argv[])
 	make_aged(ssd);
 	pre_process_page(ssd);
 	get_old_zwh(ssd);
+
+	// cachegc ³õÊ¼»¯
+	ssd->cacheNodeList.capacity = ssd->parameter->page_capacity * 128;
+	printf("ssd->parameter->page_capacity is %u\n", ssd->parameter->page_capacity);
+
+	ssd->cacheNodeList.allPage = ssd->cacheNodeList.capacity / ssd->parameter->page_capacity;
+	printf("ssd->validPageCache.allPage is %u\n", ssd->cacheNodeList.allPage);
+
+	ssd->cacheNodeList.freePage = ssd->cacheNodeList.allPage;
+	printf("ssd->validPageCache.freePage is %u\n", ssd->cacheNodeList.freePage);
+	
+	ssd->cacheNodeList.head = NULL;
+	ssd->cacheNodeList.nowType = 0;
+	ssd->cacheReq = malloc(sizeof(struct request));
+	ssd->cacheReq->subs = NULL;
+	alloc_assert(ssd->cacheReq,"ssd->validPageCacheReq");
+	memset(ssd->cacheReq,0,sizeof(struct request));
+	ssd->cacheReq->subs = NULL;
+
 	printf("free_lsb: %d, free_csb: %d, free_msb: %d\n", ssd->free_lsb_count, ssd->free_csb_count, ssd->free_msb_count);
 	printf("Total request num: %lld.\n", ssd->total_request_num);
 
@@ -89,13 +108,13 @@ int  main(int argc, char* argv[])
 	printf("GC_hard threshold: %.2f.\n", ssd->parameter->gc_hard_threshold);
 	ssd->speed_up = speed_up;
 	//*********************************************
-	/* srand((unsigned int)time(NULL));
+/* 	srand((unsigned int)time(NULL));
 	ssd=simulate(ssd); */
     
-	srand((unsigned int)time(NULL));
+ 	srand((unsigned int)time(NULL));
 	ssd=simulate_multiple(ssd, sTIMES);
 	statistic_output(ssd);  
-	/* free_all_node(ssd); */
+	free_all_node(ssd);
 
 	printf("\n");
 	printf("the simulation is completed!\n");

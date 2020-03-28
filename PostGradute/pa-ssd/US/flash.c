@@ -98,23 +98,92 @@ Status allocate_location(struct ssd_info * ssd ,struct sub_request *sub_req)
 				sub_req->location->plane=-1;
 				sub_req->location->block=-1;
 				sub_req->location->page=-1;
-
-				if (ssd->subs_w_tail!=NULL)
-				{
-					ssd->subs_w_tail->next_node=sub_req;
-					ssd->subs_w_tail=sub_req;
-				} 
+				if((sub_req->cacheFlag == 0) && ssd->dram->map->map_entry[sub_req->lpn].pn == 0){
+					CacheNode* validPageCacheNode = ssd->cacheNodeList.head;
+					if(validPageCacheNode)
+						 
+					while(validPageCacheNode){
+						//printf("validPageCacheNode->lpn %u, sub->lpn %u\n", validPageCacheNode->lpn, sub->lpn);
+						if(validPageCacheNode->lpn == sub_req->lpn){
+							 
+							break;
+						}
+						validPageCacheNode = validPageCacheNode->next;
+					} 
+					if(validPageCacheNode && (validPageCacheNode->lpn == sub_req->lpn)){
+						sub_req->current_state = SR_W_TRANSFER;
+						sub_req->current_time=ssd->current_time;
+						sub_req->next_state = SR_COMPLETE;
+						sub_req->next_state_predict_time=ssd->current_time+1000;
+						sub_req->complete_time=ssd->current_time+1000;
+						validPageCacheNode->validState |= sub_req->state;
+						if(update){
+							free(update);
+							sub_req->update = NULL;
+						}
+					} else {
+						if (ssd->subs_w_tail!=NULL)
+						{
+							ssd->subs_w_tail->next_node=sub_req;
+							ssd->subs_w_tail=sub_req;
+						} 
+						else
+						{
+							ssd->subs_w_tail=sub_req;
+							ssd->subs_w_head=sub_req;
+						}
+						if (update!=NULL)
+						{
+							if(sub_req->cacheFlag)
+								free(update);
+							else {
+								sub_req->update=update;
+								if (ssd->channel_head[update->location->channel].subs_r_tail!=NULL)            /*产生新的读请求，并且挂到channel的subs_r_tail队列尾*/
+								{
+									ssd->channel_head[update->location->channel].subs_r_tail->next_node=update;
+									ssd->channel_head[update->location->channel].subs_r_tail=update;
+								} 
+								else
+								{
+									ssd->channel_head[update->location->channel].subs_r_tail=update;
+									ssd->channel_head[update->location->channel].subs_r_head=update;
+								}
+							}
+						}
+					}
+				}
 				else
 				{
-					ssd->subs_w_tail=sub_req;
-					ssd->subs_w_head=sub_req;
-				}
+					if (ssd->subs_w_tail!=NULL)
+					{
+						ssd->subs_w_tail->next_node=sub_req;
+						ssd->subs_w_tail=sub_req;
+					} 
+					else
+					{
+						ssd->subs_w_tail=sub_req;
+						ssd->subs_w_head=sub_req;
+					}
 
-				if (update!=NULL)
-				{
-					sub_req->update=update;
+					if (update!=NULL)
+					{
+						if(sub_req->cacheFlag)
+							free(update);
+						else {
+							sub_req->update=update;
+							if (ssd->channel_head[update->location->channel].subs_r_tail!=NULL)            /*产生新的读请求，并且挂到channel的subs_r_tail队列尾*/
+							{
+								ssd->channel_head[update->location->channel].subs_r_tail->next_node=update;
+								ssd->channel_head[update->location->channel].subs_r_tail=update;
+							} 
+							else
+							{
+								ssd->channel_head[update->location->channel].subs_r_tail=update;
+								ssd->channel_head[update->location->channel].subs_r_head=update;
+							}
+						}
+					}
 				}
-
 				break;
 			}
 			case 1:
@@ -792,11 +861,21 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 	struct local * loc=NULL;
 	unsigned int flag=0;
 
-	sub = (struct sub_request*)malloc(sizeof(struct sub_request));                        /*申请一个子请求的结构*/
+	/*申请一个子请求的结构*/
+	sub = (struct sub_request*)malloc(sizeof(struct sub_request));                        
 	alloc_assert(sub,"sub_request");
 	memset(sub,0, sizeof(struct sub_request));
 
-	if(sub==NULL)
+	/* modified */
+	struct sub_request* sub_gc = NULL;
+	CacheNode *cacheNode = NULL;
+
+	/* 为 cachegc 申请一个子请求结构 */
+	sub_gc = (struct sub_request*)malloc(sizeof(struct sub_request));
+	alloc_assert(sub_gc,"subgc_request");
+	memset(sub_gc,0,sizeof(struct sub_request));
+
+	if(sub == NULL && sub_gc == NULL)
 	{
 		return NULL;
 	}
@@ -826,16 +905,20 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 		sub->next_state = SR_R_C_A_TRANSFER;
 		sub->next_state_predict_time=MAX_INT64;
 		sub->lpn = lpn;
-		sub->size=size;                                                               /*需要计算出该子请求的请求大小*/
+		/*需要计算出该子请求的请求大小*/
+		sub->size=size;                                                               
 
 		p_ch = &ssd->channel_head[loc->channel];	
 		sub->ppn = ssd->dram->map->map_entry[lpn].pn;
 		sub->operation = READ;
 		sub->state=(ssd->dram->map->map_entry[lpn].state&0x7fffffff);
-		sub_r=p_ch->subs_r_head;                                                      /*一下几行包括flag用于判断该读子请求队列中是否有与这个子请求相同的，有的话，将新的子请求直接赋为完成*/
+		sub_r=p_ch->subs_r_head;    
+
+		/*以下几行包括flag用于判断该读子请求队列中是否有与这个子请求相同的，有的话，将新的子请求直接赋为完成*/                                                  
 		flag=0;
 		while (sub_r!=NULL)
 		{
+
 			if (sub_r->ppn==sub->ppn)
 			{
 				flag=1;
@@ -845,16 +928,46 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 		}
 		if (flag==0)
 		{
-			if (p_ch->subs_r_tail!=NULL)
-			{
-				p_ch->subs_r_tail->next_node=sub;
-				p_ch->subs_r_tail=sub;
-			} 
+			if(ssd->dram->map->map_entry[sub->lpn].pn == 0){
+				cacheNode = ssd->cacheNodeList.head;
+				while(cacheNode){
+					if(cacheNode->lpn == sub->lpn)
+						break;
+					cacheNode = cacheNode->next;
+				}
+				if(cacheNode && (cacheNode->lpn == sub->lpn)){
+					sub->current_state = SR_R_DATA_TRANSFER;
+					sub->current_time=ssd->current_time;
+					sub->next_state = SR_COMPLETE;
+					sub->next_state_predict_time=ssd->current_time+1000;
+					sub->complete_time=ssd->current_time+1000;
+				} else {
+					if (p_ch->subs_r_tail!=NULL)
+					{
+						p_ch->subs_r_tail->next_node=sub;
+						p_ch->subs_r_tail=sub;
+					} 
+					else
+					{
+						p_ch->subs_r_head=sub;
+						p_ch->subs_r_tail=sub;
+					}
+				}
+			}
 			else
 			{
-				p_ch->subs_r_head=sub;
-				p_ch->subs_r_tail=sub;
+				if (p_ch->subs_r_tail!=NULL)
+				{
+					p_ch->subs_r_tail->next_node=sub;
+					p_ch->subs_r_tail=sub;
+				} 
+				else
+				{
+					p_ch->subs_r_head=sub;
+					p_ch->subs_r_tail=sub;
+				}
 			}
+			
 		}
 		else
 		{
@@ -882,6 +995,16 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 		sub->size=size;
 		sub->state=state;
 		sub->begin_time=ssd->current_time;
+
+		/* cachegc 队列判断 */
+		if (req == ssd->cacheReq)
+		{
+			sub->cacheFlag = 1;
+		}
+		else
+		{
+			sub->cacheFlag = 0;
+		}
       
 		if (allocate_location(ssd ,sub)==ERROR)
 		{

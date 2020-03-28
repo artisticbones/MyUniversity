@@ -188,10 +188,10 @@ typedef struct CacheNode
 typedef struct CacheNodeList
 {
 	struct CacheNode *head;
-	unsigned int allPage;
-	unsigned int freePage;
+	unsigned int allPage;	//capacity / page = allPageNum
+	unsigned int freePage;	
 	unsigned char nowType;
-	unsigned int capacity;
+	unsigned int capacity;	//cache ÈÝÁ¿
 };
 
 
@@ -534,6 +534,10 @@ struct sub_request{
 	unsigned int target_page_type;
 	unsigned int allocated_page_type;   //0 for lsb page, 1 for msb page;
 	//*****************************************
+
+	/* modified */
+	// unsigned int write_frequently;
+	unsigned int cacheFlag;	//0:no 1:yes
 };
 
 
