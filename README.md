@@ -39,5 +39,10 @@ title: "MyUniversity"
 - cachegc 的具体处理函数（完成）
 - 对 cachegc 后的处理操作（完成）
 
+#### Day 28
+
+今天修改第二部分，目前问题：
+- 段错误，可能在 process 处
+- 需要检查流程
 
 
