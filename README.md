@@ -45,4 +45,11 @@ title: "MyUniversity"
 - 段错误，可能在 process 处
 - 需要检查流程
 
+#### Day 30
 
+今天调完了所有的问题，但是实验结果不行，目前状况：
+- 初始化 cachegc（完成）
+- 监测并挂载 cachegc 队列（完成）
+- cachegc 的调用位置（完成）
+- cachegc 的具体处理函数（完成）
+- 对 cachegc 后的输出结束等操作（完成）

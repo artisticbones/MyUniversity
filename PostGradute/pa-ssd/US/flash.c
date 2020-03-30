@@ -71,8 +71,8 @@ Status allocate_location(struct ssd_info * ssd ,struct sub_request *sub_req)
 				update->ppn = ssd->dram->map->map_entry[sub_req->lpn].pn;
 				update->operation = READ;
 				
-				if (ssd->channel_head[location->channel].subs_r_tail!=NULL)            /*产生新的读请求，并且挂到channel的subs_r_tail队列尾*/
-				{
+/* 				if (ssd->channel_head[location->channel].subs_r_tail!=NULL)            /*产生新的读请求，并且挂到channel的subs_r_tail队列尾*/
+/* 				{
 						ssd->channel_head[location->channel].subs_r_tail->next_node=update;
 						ssd->channel_head[location->channel].subs_r_tail=update;
 				} 
@@ -80,7 +80,7 @@ Status allocate_location(struct ssd_info * ssd ,struct sub_request *sub_req)
 				{
 					ssd->channel_head[location->channel].subs_r_tail=update;
 					ssd->channel_head[location->channel].subs_r_head=update;
-				}
+				} */ 
 			}
 		}
 		/***************************************
@@ -98,9 +98,9 @@ Status allocate_location(struct ssd_info * ssd ,struct sub_request *sub_req)
 				sub_req->location->plane=-1;
 				sub_req->location->block=-1;
 				sub_req->location->page=-1;
+
 				if((sub_req->cacheFlag == 0) && ssd->dram->map->map_entry[sub_req->lpn].pn == 0){
 					CacheNode* validPageCacheNode = ssd->cacheNodeList.head;
-					if(validPageCacheNode)
 						 
 					while(validPageCacheNode){
 						//printf("validPageCacheNode->lpn %u, sub->lpn %u\n", validPageCacheNode->lpn, sub->lpn);
@@ -341,6 +341,8 @@ Status allocate_location(struct ssd_info * ssd ,struct sub_request *sub_req)
 			ssd->channel_head[sub_req->location->channel].subs_w_head=sub_req;
 		}
 	}
+
+	printf("allocate_location finished!\n");
 	return SUCCESS;					
 }	
 
@@ -866,16 +868,18 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 	alloc_assert(sub,"sub_request");
 	memset(sub,0, sizeof(struct sub_request));
 
-	/* modified */
-	struct sub_request* sub_gc = NULL;
-	CacheNode *cacheNode = NULL;
+	printf("into creat_sub_request function!\n");
+
+ 	/* modified */
+/* 	struct sub_request* sub_gc = NULL;
+	CacheNode *cacheNode = NULL; */
 
 	/* 为 cachegc 申请一个子请求结构 */
-	sub_gc = (struct sub_request*)malloc(sizeof(struct sub_request));
+/* 	sub_gc = (struct sub_request*)malloc(sizeof(struct sub_request));
 	alloc_assert(sub_gc,"subgc_request");
-	memset(sub_gc,0,sizeof(struct sub_request));
+	memset(sub_gc,0,sizeof(struct sub_request)); */
 
-	if(sub == NULL && sub_gc == NULL)
+	if(sub == NULL)
 	{
 		return NULL;
 	}
@@ -898,6 +902,7 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 	if (operation == READ)
 	{	
 		loc = find_location(ssd,ssd->dram->map->map_entry[lpn].pn);
+		//printf("loc ------------> %d\n",loc);
 		sub->location=loc;
 		sub->begin_time = ssd->current_time;
 		sub->current_state = SR_WAIT;
@@ -929,7 +934,7 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 		if (flag==0)
 		{
 			if(ssd->dram->map->map_entry[sub->lpn].pn == 0){
-				cacheNode = ssd->cacheNodeList.head;
+				CacheNode *cacheNode = ssd->cacheNodeList.head;
 				while(cacheNode){
 					if(cacheNode->lpn == sub->lpn)
 						break;
@@ -940,6 +945,7 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 					sub->current_time=ssd->current_time;
 					sub->next_state = SR_COMPLETE;
 					sub->next_state_predict_time=ssd->current_time+1000;
+					// printf("sub->next_state_predict_time ----> %d\n",sub->next_state_predict_time);
 					sub->complete_time=ssd->current_time+1000;
 				} else {
 					if (p_ch->subs_r_tail!=NULL)
@@ -982,7 +988,12 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 	*写请求的情况下，就需要利用到函数allocate_location(ssd ,sub)来处理静态分配和动态分配了
 	**************************************************************************************/
 	else if(operation == WRITE)
-	{                                
+	{           
+		/* 师兄添加的 */
+		unsigned long offset_map_write_block;
+		unsigned int pos_map_write_block;
+		static unsigned int write_request_count = 0;
+
 		sub->ppn=0;
 		sub->operation = WRITE;
 		sub->location=(struct local *)malloc(sizeof(struct local));
@@ -1025,6 +1036,8 @@ struct sub_request * creat_sub_request(struct ssd_info * ssd,unsigned int lpn,in
 		printf("\nERROR ! Unexpected command.\n");
 		return NULL;
 	}
+
+	printf("create_sub_request finished!\n");
 	
 	return sub;
 }
@@ -1890,7 +1903,8 @@ struct ssd_info *process(struct ssd_info *ssd)
 	unsigned int i,chan,random_num;     
 	unsigned int flag=0,new_write=0,chg_cur_time_flag=1,flag2=0,flag_gc=0;       
 	int64_t time, channel_time=MAX_INT64;
-	struct sub_request *sub;          
+	struct sub_request *sub;   
+	printf("into process!\n");       
 
 #ifdef DEBUG
 	printf("enter process,  current time:%lld\n",ssd->current_time);
@@ -1915,7 +1929,7 @@ struct ssd_info *process(struct ssd_info *ssd)
 	if(flag==1)	//不存在读写子请求
 	{
 		CacheNode* cacheNode = ssd->cacheNodeList.head;	//SSD 中如果有需要进行 cachegc，将头结点给cacheNode
-		
+		printf("cacheNode is Ready!\n");
 		if (cacheNode)
 		{
 			unsigned char loopFlag = 0;	// 控制结束cachegc
@@ -2005,7 +2019,7 @@ struct ssd_info *process(struct ssd_info *ssd)
 			}	
 		}	
 	}
-
+	printf("process function finished!\n");
 	return ssd;
 }
 

@@ -69,7 +69,7 @@ extern int freeFunc(TREE_NODE *pNode)
 *******************************************/
 struct ssd_info *initiation(struct ssd_info *ssd)
 {
-	unsigned int x=0,y=0,i=0,j=0,k=0,l=0,m=0,n=0;
+	unsigned int x=0,y=0,i=0,j=0,k=0,l=0,m=0,n=0,t=0,r=0,p=0,a=0,s=0;
 	//errno_t err;
 	char buffer[300];
 	struct parameter_value *parameters;
@@ -118,6 +118,7 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 	alloc_assert(ssd->channel_head,"ssd->channel_head");
 	memset(ssd->channel_head,0,ssd->parameter->channel_number * sizeof(struct channel_info));
 	initialize_channels(ssd );
+
 	//====================================
 	ssd->time_day = 0;
 	ssd->current_time = 0;
@@ -151,6 +152,25 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 	printf("FREE_LSB_COUNT: %d\n",ssd->free_lsb_count);
 	//====================================
 	printf("\n");
+
+
+	// cachegc ³õÊ¼»¯
+	ssd->cacheNodeList.capacity = ssd->parameter->page_capacity * 128;
+	printf("ssd->parameter->page_capacity is %u\n", ssd->parameter->page_capacity);
+
+	ssd->cacheNodeList.allPage = ssd->cacheNodeList.capacity / ssd->parameter->page_capacity;
+	printf("ssd->validPageCache.allPage is %u\n", ssd->cacheNodeList.allPage);
+
+	ssd->cacheNodeList.freePage = ssd->cacheNodeList.allPage;
+	printf("ssd->validPageCache.freePage is %u\n", ssd->cacheNodeList.freePage);
+	
+	ssd->cacheNodeList.head = NULL;
+	ssd->cacheNodeList.nowType = 0;
+	ssd->cacheReq = malloc(sizeof(struct request));
+	ssd->cacheReq->subs = NULL;
+	alloc_assert(ssd->cacheReq,"ssd->validPageCacheReq");
+	memset(ssd->cacheReq,0,sizeof(struct request));
+	ssd->cacheReq->subs = NULL;
 
 	ssd->outputfile=fopen(ssd->outputfilename,"w");
 	if(ssd->outputfile==NULL)
