@@ -27,6 +27,8 @@ Hao Luo         2011/01/01        2.0           Change               luohao13568
 #include <sys/types.h>
 #include "avlTree.h"
 
+#define NULL 0
+
 #define SECTOR 512
 #define BUFSIZE 200
 

@@ -227,9 +227,10 @@ struct ssd_info *simulate(struct ssd_info *ssd)
 			else
 			{
 				no_buffer_distribute(ssd);
+				printf("finish distrtbute!\n");
 			}		
 		}
-
+		printf("ready to process!\n");
 		process(ssd);
 		trace_output(ssd);
 		if (flag == 0) {
@@ -1851,6 +1852,7 @@ struct ssd_info *no_buffer_distribute(struct ssd_info *ssd)
 			//printf("sub_size: %d\n", sub_size);
 			sub=creat_sub_request(ssd,lpn,sub_size,state,req,req->operation,target_page_type);
 			lpn++;
+			printf("WRITE++ %d  %d\n",lpn,last_lpn);
 		}
 	}
 

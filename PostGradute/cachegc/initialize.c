@@ -139,7 +139,7 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 	initialize_channels(ssd );
 
 
-	//initial erase
+/* 	//initial erase
 	for (i = 0; i < ssd->parameter->channel_number; i++)
 	{
 		for (j = 0; j < ssd->parameter->chip_num /ssd->parameter->channel_number; j++)
@@ -267,7 +267,7 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 				}
 			}
 		}
-	}
+	} */
 	/* double gaussrand()
 	{
 		static double U, V;
@@ -364,7 +364,7 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 	printf("FREE_LSB_COUNT: %ld\n",ssd->free_lsb_count);
 	//====================================
 
-	//init valid pages
+/* 	//init valid pages
 	for (i = 0; i < ssd->parameter->channel_number; i++)
 	{
 		for (j = 0; j < ssd->parameter->chip_num / ssd->parameter->channel_number; j++)
@@ -397,14 +397,15 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 				}
 			}
 		}
-	}
+	} */
 
 
 	//init BET
 	/*for(i = 0 ; i<ssd->parameter->block_plane*ssd->parameter->plane_die*ssd->parameter->die_chip*ssd->parameter->chip_num; i++){
 		ssd->BET[i] = 0;
 		//printf("%d\n", ssd->BET[i]);
-	}*/
+	}
+*/
 	
 	/* //init UBT
 	for(i = 0 ; i<ssd->parameter->block_plane*ssd->parameter->plane_die*ssd->parameter->die_chip*ssd->parameter->chip_num; i++){

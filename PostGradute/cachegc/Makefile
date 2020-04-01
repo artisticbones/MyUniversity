@@ -1,24 +1,20 @@
 # ssdsim linux support
-.PHONY : all clean rebuild  
-
-all: ssd
+all:ssd 
 	
 clean:
 	rm -f ssd *.o *~
 .PHONY: clean
 
 ssd: ssd.o avlTree.o flash.o initialize.o pagemap.o     
-	cc -m32 -g -lm -o ssd ssd.o avlTree.o flash.o initialize.o pagemap.o -lm
+	cc -g -o ssd ssd.o avlTree.o flash.o initialize.o pagemap.o
 ssd.o: flash.h initialize.h pagemap.h
-	gcc -c -m32 -g -lm ssd.c -lm
+	gcc -c -g ssd.c
 flash.o: pagemap.h
-	gcc -c -m32 -g -lm flash.c 
+	gcc -c -g flash.c
 initialize.o: avlTree.h pagemap.h
-	gcc -c -m32 -g -lm initialize.c -lm 
+	gcc -c -g initialize.c
 pagemap.o: initialize.h
-	gcc -c -m32 -g -lm pagemap.c -lm
+	gcc -c -g pagemap.c
 avlTree.o: 
-	gcc -c -m32 -g -lm avlTree.c -lm
-
-rebuild : clean all
+	gcc -c -g avlTree.c
 

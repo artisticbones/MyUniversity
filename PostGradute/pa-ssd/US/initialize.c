@@ -73,7 +73,12 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 	//errno_t err;
 	char buffer[300];
 	struct parameter_value *parameters;
+	int count = 0;
 	FILE *fp=NULL;
+	unsigned int lpn = 0;
+	unsigned int lsn = 100000;
+	unsigned int ppn, full_page;
+	int sub_size = 4;
 	
 	/*printf("input parameter file name:");
 	gets(ssd->parameterfilename);
@@ -119,6 +124,136 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 	memset(ssd->channel_head,0,ssd->parameter->channel_number * sizeof(struct channel_info));
 	initialize_channels(ssd );
 
+	//initial erase
+	for (i = 0; i < ssd->parameter->channel_number; i++)
+	{
+		for (j = 0; j < ssd->parameter->chip_num /ssd->parameter->channel_number; j++)
+		{
+			for (k = 0; k < ssd->parameter->die_chip; k++)
+			{
+				for (m = 0; m < ssd->parameter->plane_die; m++)
+				{
+				
+						
+					
+						for (n = 0; n < 0.001 * ssd->parameter->block_plane; n++)
+						{
+							if(n % 2 ==1)
+							    ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 15000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 145000;
+						}
+						count++;
+						for (n = floor(0.001 * ssd->parameter->block_plane); n < 0.006 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 25000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 135000;
+						}
+						count++;
+						for (n = floor(0.006 * ssd->parameter->block_plane); n < 0.023 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 35000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 125000;
+						}
+						count++;
+						for (n = floor(0.023 * ssd->parameter->block_plane); n < 0.067 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 45000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 115000;
+						}
+						count++;
+						for (n = floor(0.067 * ssd->parameter->block_plane); n < 0.159 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 55000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 105000;
+						}
+						count++;
+						for (n = floor(0.159 * ssd->parameter->block_plane); n < 0.309 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 65000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 95000;
+						}
+						count++;
+						for (n = floor(0.309 * ssd->parameter->block_plane); n < 0.5 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 75000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 85000;
+						}
+						count++;
+						for (n = floor(0.5 * ssd->parameter->block_plane); n < 0.691 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 85000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 75000;
+						}
+						count++;
+						for (n = floor(0.691 * ssd->parameter->block_plane); n < 0.841 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 95000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 65000;
+						}
+						count++;
+						for (n = floor(0.841 * ssd->parameter->block_plane); n < 0.933 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 105000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 55000;
+						}
+						count++;
+						for (n = floor(0.933 * ssd->parameter->block_plane); n < 0.977 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 115000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 45000;
+						}
+						count++;
+						for (n = floor(0.977 * ssd->parameter->block_plane); n < 0.994 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 125000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 35000;
+						}
+						count++;
+						for (n = floor(0.994 * ssd->parameter->block_plane); n < 0.999 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 135000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 25000;
+						}
+						count++;
+						for (n = floor(0.999 * ssd->parameter->block_plane); n < 1 * ssd->parameter->block_plane; n++)
+						{
+							if (n % 2 == 1)
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 145000;
+							else
+								ssd->channel_head[i].chip_head[j].die_head[k].plane_head[m].blk_head[n].erase_count = 15000;
+						}
+						count++;
+						
+				}
+			}
+		}
+	}
+
 	//====================================
 	ssd->time_day = 0;
 	ssd->current_time = 0;
@@ -152,6 +287,41 @@ struct ssd_info *initiation(struct ssd_info *ssd)
 	printf("FREE_LSB_COUNT: %d\n",ssd->free_lsb_count);
 	//====================================
 	printf("\n");
+	
+	//init valid pages
+	for (i = 0; i < ssd->parameter->channel_number; i++)
+	{
+		for (j = 0; j < ssd->parameter->chip_num / ssd->parameter->channel_number; j++)
+		{
+			for (k = 0; k < ssd->parameter->die_chip; k++)
+			{
+				for (l = 0; l < ssd->parameter->plane_die; l++)
+				{
+					for (m = 0; m < ssd->parameter->block_plane; m++)
+					{
+						for (n = 0; n < 0 * ssd->parameter->page_block; n++)
+						{
+
+							lpn = lsn / ssd->parameter->subpage_page;
+							ppn = find_ppn(ssd, i, j, k, l, m, n);
+							//modify state
+							ssd->dram->map->map_entry[lpn].pn = ppn;
+							ssd->dram->map->map_entry[lpn].state = set_entry_state(ssd, lsn, sub_size);   //0001
+							ssd->channel_head[i].chip_head[j].die_head[k].plane_head[l].blk_head[m].page_head[n].lpn = lpn;
+							ssd->channel_head[i].chip_head[j].die_head[k].plane_head[l].blk_head[m].page_head[n].valid_state = ssd->dram->map->map_entry[lpn].state;
+							ssd->channel_head[i].chip_head[j].die_head[k].plane_head[l].blk_head[m].page_head[n].free_state = ((~ssd->dram->map->map_entry[lpn].state) & full_page);
+							//--
+							ssd->channel_head[i].chip_head[j].die_head[k].plane_head[l].blk_head[m].last_write_page++;
+							ssd->channel_head[i].chip_head[j].die_head[k].plane_head[l].blk_head[m].free_page_num--;
+							ssd->channel_head[i].chip_head[j].die_head[k].plane_head[l].free_page--;
+							lsn++;
+						}
+					}
+
+				}
+			}
+		}
+	}
 
 
 	// cachegc ≥ı ºªØ

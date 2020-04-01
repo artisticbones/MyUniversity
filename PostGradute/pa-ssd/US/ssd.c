@@ -53,9 +53,9 @@ int  main(int argc, char* argv[])
 	/* SSDsim 基本过程 1.初始化 2.预处理 3.旧化SSD 4.寻找最近事件函数  */
 	ssd=initiation(ssd);
 	printf("Chip_channel: %d, %d\n", ssd->parameter->chip_channel[0],ssd->parameter->chip_num);
-	make_aged(ssd);
+	// make_aged(ssd);
 	pre_process_page(ssd);
-	get_old_zwh(ssd);
+	// get_old_zwh(ssd);
 
 	printf("free_lsb: %d, free_csb: %d, free_msb: %d\n", ssd->free_lsb_count, ssd->free_csb_count, ssd->free_msb_count);
 	printf("Total request num: %lld.\n", ssd->total_request_num);

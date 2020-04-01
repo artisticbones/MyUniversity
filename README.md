@@ -53,3 +53,7 @@ title: "MyUniversity"
 - cachegc 的调用位置（完成）
 - cachegc 的具体处理函数（完成）
 - 对 cachegc 后的输出结束等操作（完成）
+
+### April
+#### Day 1
+修改cachegc 和 自己写的代码
