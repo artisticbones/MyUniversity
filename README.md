@@ -57,3 +57,5 @@ title: "MyUniversity"
 ### April
 #### Day 1
 修改cachegc 和 自己写的代码
+#### Day 6
+学习C++，目前从零开始学习，现在主要学习C++ 的输入输出。
