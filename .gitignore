@@ -1,10 +1,23 @@
-/*
 !.gitignore
 !*.md
-!CProject/**/*.cpp
-!CProject/**/*.md
-!CourseSource/*.c
-!Cryptography/*.c
-!Leetcode/*.c
-!PostGradute/cachegc/*.c
-!PostGradute/pa-ssd/US/*.c
+!*.cpp
+!*.c
+!*.h
+/*
+!CProject/
+!CourseSource/
+!Cryptography/
+!Leetcode/
+!PostGradute/
+# !/**/*.md
+# !/**/*.cpp
+# !/**/*.c
+# !/**/*.h
+
+# !CProject/**/*.cpp
+# !CProject/**/*.md
+# !CourseSource/*.c
+# !Cryptography/*.c
+# !Leetcode/*.c
+# !PostGradute/cachegc/*.c
+# !PostGradute/pa-ssd/US/*.c
