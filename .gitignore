@@ -1,10 +1,10 @@
+!.gitignore
+!*.c
+!*.cpp
+!*.md
+/CProject/LearnC++/*.o
 /CourseSource/*
-/CProject/LearnC++/*
 /Cryptography/*
 /Leetcode/*
 /PostGradute/cachegc/*
 /PostGradute/pa-ssd/US/*
-!*.cpp
-!*.c
-!README.md
-!.gitignore
