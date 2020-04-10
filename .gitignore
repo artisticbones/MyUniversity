@@ -1,7 +1,11 @@
-/**
-!.gitignore
-!README.md
-!**/*.cpp
-!**/*.h
-!**/*.c
-!**/*.md
+# /**
+# !.gitignore
+# !README.md
+# !**/*.cpp
+# !**/*.h
+# !**/*.c
+# !**/*.md
+
+*.o
+*.txt
+*.out
