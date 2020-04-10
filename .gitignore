@@ -4,7 +4,7 @@
 !/CProject/**/*.cpp
 !/CProject/**/*.md
 !/CourseSource/*.c
-/Cryptography/*.c
-/Leetcode/*.c
-/PostGradute/cachegc/*.c
-/PostGradute/pa-ssd/US/*.c
+!/Cryptography/*.c
+!/Leetcode/*.c
+!/PostGradute/cachegc/*.c
+!/PostGradute/pa-ssd/US/*.c
