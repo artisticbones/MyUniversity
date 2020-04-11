@@ -1,11 +1,16 @@
-# /**
-# !.gitignore
-# !README.md
-# !**/*.cpp
-# !**/*.h
-# !**/*.c
-# !**/*.md
+#C and C++
+*
+!*.c
+!*.cpp
+!*.cxx
+!*.cc
+!*.h
+!*.md
+!Makefile
+!.gitignore
 
-*.o
-*.txt
-*.out
+#java
+*.class
+
+#VScode
+.vscode/
