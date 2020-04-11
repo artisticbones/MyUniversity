@@ -1,19 +1,19 @@
 #C and C++
 *
 !.gitignore
-!README.md
 !*/
+!*.md
 !*.cpp
 !*.cxx
 !*.c
 !*.cc
 !*.h
+!.**/*.md
 !.**/*.cpp
 !.**/*.cxx
 !.**/*.c
 !.**/*.cc
 !.**/*.h
-!.**/*.md
 
 #java
 !*.java
