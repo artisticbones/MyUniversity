@@ -16,5 +16,10 @@ int main()
     cout << temp << endl;
 
     cout << dec << temp << endl;
+    char ch;
+    cin >> ch;
+    int i;
+    i = ch;
+    cout << ch << endl << i << endl;
     return 0;
 }
