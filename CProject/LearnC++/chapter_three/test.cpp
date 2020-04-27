@@ -9,9 +9,12 @@ using namespace std;
 
 int main()
 {
-    int temp{7};
+    int temp = 16;
+
+    cout << hex;
+
     cout << temp << endl;
-    //int temp{8};
-    cout << temp << endl;
+
+    cout << dec << temp << endl;
     return 0;
 }
