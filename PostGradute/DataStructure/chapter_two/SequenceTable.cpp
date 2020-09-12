@@ -33,7 +33,30 @@ bool ListInsert(SqList &L, int i, ElemType e){
     L.length++;
     return true;
 }
-
+bool ListDelete(SqList &L, int i, ElemType &e)
+{
+    if (i < 1 || i > L.length + 1)
+    {
+        return false;
+    }
+    e = L.data[i - 1];
+    for (int j = i; j < L.length; j++)
+    {
+       L.data[j-1] = L.data[j]; 
+    }
+    L.length--;
+    return true;
+}
+int LocateElem(SqList L,ElemType e){
+    for (int i = 0; i < L.length; i++)
+    {
+        if (L.data[i] == e)
+        {
+            return i + 1;
+        }
+    }
+    return 0;
+}
 int main(int args, char **argv)
 {
     SqList L;
@@ -49,7 +72,7 @@ int main(int args, char **argv)
         {
             int location = 0;
             ElemType e;
-            cout << "Please input location and elem:";
+            cout << "Please input location and elem:" << endl;
             cin >> location;
             cin >> e;
             ListInsert(L,location,e);
@@ -57,7 +80,28 @@ int main(int args, char **argv)
         }
         else if (condition == 2)
         {
-            
+            int location = 0;
+            ElemType e;
+            cout << "Please input location and elem:" << endl;
+            cin >> location;
+            cin >> e;
+            ListDelete(L,location,e);
+           
+        }
+        else if (condition == 3)
+        {
+            ElemType e;
+            cout << "Please input the value you want to locate:";
+            cin >> e;
+            cout << "The Location is: " << LocateElem(L,e);
+        }
+        else if (condition == 5)
+        {
+            for (int i = 0; i < L.length; i++)
+            {
+                cout << L.data[i] << "\t";
+            }
+               
         }
         
     }while (condition != 10000);
