@@ -34,31 +34,33 @@ bool ListInsert(SqList &L, int i, ElemType e){
     return true;
 }
 
-int main()
+int main(int args, char **argv)
 {
     SqList L;
-    int condition = 0;
+    int condition;
     for (int i = 0; i < L.length; i++)
     {
         L.data[i] = i;
     }
-
-    while (condition != 9999)
-    {
-        switch (condition)
+    do{
+        cout << "Please choose the function:";
+        cin >> condition;
+        if (condition == 1)
         {
-        case 1:
             int location = 0;
             ElemType e;
             cout << "Please input location and elem:";
             cin >> location;
             cin >> e;
             ListInsert(L,location,e);
-            break;
-        default:
-            break;
+           
         }
-    }
+        else if (condition == 2)
+        {
+            
+        }
+        
+    }while (condition != 9999);
     
     
     return 0;
