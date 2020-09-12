@@ -60,7 +60,7 @@ int main(int args, char **argv)
             
         }
         
-    }while (condition != 9999);
+    }while (condition != 10000);
     
     
     return 0;
