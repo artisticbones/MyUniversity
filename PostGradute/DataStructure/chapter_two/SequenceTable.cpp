@@ -75,7 +75,14 @@ int main(int args, char **argv)
             cout << "Please input location and elem:" << endl;
             cin >> location;
             cin >> e;
-            ListInsert(L,location,e);
+            if(ListInsert(L,location,e)){
+                cout << "Success!" << endl;
+            }
+            else
+            {
+                cout << "Insert false!" << endl;
+            }
+            
            
         }
         else if (condition == 2)
@@ -93,7 +100,7 @@ int main(int args, char **argv)
             ElemType e;
             cout << "Please input the value you want to locate:";
             cin >> e;
-            cout << "The Location is: " << LocateElem(L,e);
+            cout << "The Location is: " << LocateElem(L,e) << endl;
         }
         else if (condition == 5)
         {
@@ -101,7 +108,7 @@ int main(int args, char **argv)
             {
                 cout << L.data[i] << "\t";
             }
-               
+            cout << endl;               
         }
         
     }while (condition != 10000);
