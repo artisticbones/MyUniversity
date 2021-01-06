@@ -2,7 +2,7 @@
 
 int main(){
     char *str;
-    __asm(
+    asm volatile(
         "call @@1           \n\
         db 'mystr', 0       \n\
         @@1:                \n\
