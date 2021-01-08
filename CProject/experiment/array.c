@@ -5,6 +5,8 @@ int main(void){
     int a[2][2];
     int **ptr = a;
 
+    int a[][2] = {0};
+
     printf("a 的存储内容：%d\n",a);
     printf("a 的大小：%d\n",sizeof(a));
     printf("二级指针ptr的存储内容：%d\n",ptr);
