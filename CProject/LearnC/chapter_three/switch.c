@@ -16,10 +16,6 @@ int main(void) {
     int x = 0;
 
     if(scanf("%d",&x) != EOF){
-        /**
-         * 程序主逻辑
-         * 
-         */
         int f = x / abs(x);
         switch (f)
         {
