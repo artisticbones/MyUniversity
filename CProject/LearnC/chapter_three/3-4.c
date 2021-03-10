@@ -19,34 +19,24 @@ int main(void) {
     /* 主逻辑 */
     do
     {
-        int code = 0;
-        if (scanf("%c",&c[cnt]) != EOF)
-        {   
-            code = c[cnt] - 0;
-            if (code >= 65 && code <= 90)
-            {
-                letter++;
-            }else if (code >= 97 && code <= 122)
-            {
-                letter++;
-            }else if (code == 13 || code == 32)
-            {
-                blank++;
-            }else if (code >= 48 && code <= 57)
-            {
-                digit++;
-            }else {
-                other++;
-            }
+        c[cnt] = getchar(); 
+        if (c[cnt] >= 'a' && c[cnt] <= 'z')
+        {
+            letter++;
+        }else if (c[cnt] >= 'A' && c[cnt] <= 'Z')
+        {
+            letter++;
+        }else if (c[cnt] == ' ' || c[cnt] == '\n')
+        {
+            blank++;
+        }else if (c[cnt] >= '0' && c[cnt] <= '9')
+        {
+            digit++;
+        }else {
+            other++;
         }
         cnt++;
-
     } while (cnt != 10);
     printf("letter = %d, blank = %d, digit = %d, other = %d\n",letter,blank,digit,other);    
-    printf("cnt\tcharacter\n");
-    for (int  i = 0; i < 10; i++)
-    {
-        printf("%d\t%c\n",i,c[i]);
-    }
     return 0;
 }
